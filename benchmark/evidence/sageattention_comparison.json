@@ -1,0 +1,32 @@
+{
+  "configuration": "FP8 E4M3 fast, 49-frame windows, face enhancement, torch.compile, same inputs and seed",
+  "old_sageattention_version": "1.0.6",
+  "new_sageattention_version": "2.2.0",
+  "new_sageattention_source": "Official SageAttention v2.2.0 tag built locally against torch 2.10.0.dev20250923+cu128 with CUDA 12.8",
+  "baseline_timings": "script2video_direct/runs/with_face_fp8_frames49/timings.json",
+  "variant_timings": "script2video_direct/runs/with_face_fp8_frames49_sage22/timings.json",
+  "transformer_cuda_seconds": {
+    "sage_1_0_6": 129.293,
+    "sage_2_2_0": 108.637,
+    "seconds_saved": 20.656,
+    "speedup": 1.1901,
+    "reduction_percent": 15.98
+  },
+  "run_message_seconds": {
+    "sage_1_0_6": 229.279,
+    "sage_2_2_0": 207.994,
+    "seconds_saved": 21.285,
+    "speedup": 1.1023,
+    "reduction_percent": 9.28
+  },
+  "similarity_to_sage_1_0_6_video": {
+    "psnr_db": 28.712116,
+    "ssim": 0.944185
+  },
+  "comparison_scope": "Single full run per version; timing excludes worker initialization but includes generation and face enhancement.",
+  "similarity_to_original_267s_q8_gguf_baseline_video": {
+    "reference": "script2video_direct/runs/with_face_profile/final.mp4",
+    "psnr_db": 24.236173,
+    "ssim": 0.923214
+  }
+}

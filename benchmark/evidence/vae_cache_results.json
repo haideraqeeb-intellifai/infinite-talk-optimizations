@@ -1,0 +1,74 @@
+{
+  "main": {
+    "original_seconds": 267.065,
+    "current_optimized_seconds": 176.309,
+    "cached_optimized_seconds": 158.016,
+    "seconds_saved_vs_current": 18.293,
+    "speedup_vs_original": 1.6901,
+    "speedup_vs_current": 1.1158,
+    "cache_hits": 11,
+    "cache_misses": 1,
+    "byte_identical_to_current": true,
+    "sha256": "50a2818f1b38fd12d8f924f0d1504a820a88366579bdc98775cfed7318959260",
+    "psnr_ssim_vs_original": {
+      "psnr_db": 24.683472,
+      "ssim": 0.924783
+    },
+    "cached_video": "/home/raqeeb/code/infinite-talk-optimizations/script2video_direct/runs/with_face_fp8_frames49_sage22_reuse_wan_tea260_end2_vae_cache_identical_encode/final.mp4",
+    "timings_json": "/home/raqeeb/code/infinite-talk-optimizations/script2video_direct/runs/with_face_fp8_frames49_sage22_reuse_wan_tea260_end2_vae_cache_identical_encode/timings.json"
+  },
+  "s01": {
+    "original_seconds": 164.366,
+    "current_optimized_seconds": 108.814,
+    "cached_optimized_seconds": 98.089,
+    "seconds_saved_vs_current": 10.725,
+    "speedup_vs_original": 1.6757,
+    "speedup_vs_current": 1.1093,
+    "cache_hits": 6,
+    "cache_misses": 1,
+    "byte_identical_to_current": true,
+    "sha256": "4ddbfcd0a2b3826e163aa74404dfb9b557c68222e69d84788f8c1897994c75c5",
+    "psnr_ssim_vs_original": {
+      "psnr_db": 26.669971,
+      "ssim": 0.949353
+    },
+    "cached_video": "/home/raqeeb/code/infinite-talk-optimizations/script2video_direct/runs/with_face_fp8_frames49_sage22_reuse_wan_tea260_end2_vae_cache_identical_encode_s01/final.mp4",
+    "timings_json": "/home/raqeeb/code/infinite-talk-optimizations/script2video_direct/runs/with_face_fp8_frames49_sage22_reuse_wan_tea260_end2_vae_cache_identical_encode_s01/timings.json"
+  },
+  "s03": {
+    "original_seconds": 78.561,
+    "current_optimized_seconds": 61.602,
+    "cached_optimized_seconds": 55.712,
+    "seconds_saved_vs_current": 5.89,
+    "speedup_vs_original": 1.4101,
+    "speedup_vs_current": 1.1057,
+    "cache_hits": 3,
+    "cache_misses": 1,
+    "byte_identical_to_current": true,
+    "sha256": "9d63001e174a9dfa32c442d79f18c68cb87052b540fc77f870b16a17fc599cef",
+    "psnr_ssim_vs_original": {
+      "psnr_db": 25.876326,
+      "ssim": 0.924594
+    },
+    "cached_video": "/home/raqeeb/code/infinite-talk-optimizations/script2video_direct/runs/with_face_fp8_frames49_sage22_reuse_wan_tea260_end2_vae_cache_identical_encode_s03/final.mp4",
+    "timings_json": "/home/raqeeb/code/infinite-talk-optimizations/script2video_direct/runs/with_face_fp8_frames49_sage22_reuse_wan_tea260_end2_vae_cache_identical_encode_s03/timings.json"
+  },
+  "s06": {
+    "original_seconds": 218.479,
+    "current_optimized_seconds": 139.524,
+    "cached_optimized_seconds": 123.345,
+    "seconds_saved_vs_current": 16.179,
+    "speedup_vs_original": 1.7713,
+    "speedup_vs_current": 1.1312,
+    "cache_hits": 9,
+    "cache_misses": 1,
+    "byte_identical_to_current": true,
+    "sha256": "9cb7f3a41c367bb4fa3aa85eea4bb9968bf7c7c1861e7775e5d35065672b1a06",
+    "psnr_ssim_vs_original": {
+      "psnr_db": 25.17848,
+      "ssim": 0.903825
+    },
+    "cached_video": "/home/raqeeb/code/infinite-talk-optimizations/script2video_direct/runs/with_face_fp8_frames49_sage22_reuse_wan_tea260_end2_vae_cache_identical_encode_s06/final.mp4",
+    "timings_json": "/home/raqeeb/code/infinite-talk-optimizations/script2video_direct/runs/with_face_fp8_frames49_sage22_reuse_wan_tea260_end2_vae_cache_identical_encode_s06/timings.json"
+  }
+}

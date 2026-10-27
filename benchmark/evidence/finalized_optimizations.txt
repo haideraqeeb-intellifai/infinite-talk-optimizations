@@ -1,0 +1,59 @@
+Finalized image2video_infinitetalk optimizations
+Configuration: RTX 5090, face enhancement on, seed 8818, LightX2V rank-64 four-step LoRA, torch.compile, 832x480 render, 1920x1080 output, 463 frames at 25 fps. SageAttention version is specified for each comparison below.
+
+1. FP8 compute (Wan I2V fp8_e4m3fn_fast with FP16 InfiniteTalk adapter; SageAttention 1.0.6)
+   Transformer: 179.246 s (original Q8 GGUF baseline) -> 143.989 s (FP8, 81-frame windows).
+   Gain: 1.245x transformer speedup; 19.7% less transformer time.
+   Full generation: 267.065 s -> 237.764 s; 29.301 s saved (11.0% less request time).
+   Similarity to original final video: 31.117965 dB PSNR; 0.952170 SSIM.
+   Report: https://s3.renderplatform.com/agent-assets/Raqeeb/report_fp8_vs_gguf/index.html
+
+2. 49-frame sampling windows with FP8 compute (9-frame overlap; SageAttention 1.0.6)
+   Transformer: 143.989 s (FP8, 81-frame windows) -> 129.293 s (FP8, 49-frame windows).
+   Gain: 1.114x transformer speedup; 10.2% less transformer time.
+   Full generation: 237.764 s -> 229.279 s; 8.485 s saved (3.6% less request time).
+   Similarity to FP8 81-frame final video: 24.526360 dB PSNR; 0.923046 SSIM.
+   Report: https://s3.renderplatform.com/agent-assets/Raqeeb/report_fp8_window49/index.html
+
+3. SageAttention 2.2 with FP8 compute and 49-frame windows
+   Transformer: 129.293 s (SageAttention 1.0.6) -> 108.637 s (SageAttention 2.2).
+   Gain: 1.190x transformer speedup; 16.0% less transformer time.
+   Full generation: 229.279 s -> 207.994 s; 21.285 s saved (9.3% less request time).
+   Similarity to SageAttention 1.0.6 final video: 28.712116 dB PSNR; 0.944185 SSIM.
+   Similarity to original Q8 GGUF final video: 24.236173 dB PSNR; 0.923214 SSIM.
+   Results: /home/raqeeb/code/infinite-talk-optimizations/script2video_direct/runs/with_face_fp8_frames49_sage22/comparison.json
+   Video: /home/raqeeb/code/infinite-talk-optimizations/script2video_direct/runs/with_face_fp8_frames49_sage22/final.mp4
+
+4. Reuse the initialized Wan model for the request when the loader configuration matches
+   At 832x480, block swapping is disabled and the request's Wan loader arguments match initialization. Skip the redundant request-time model reload.
+   Model reload (profiled): 6.774 s -> 0.000 s.
+   Full generation (matched profiled runs): 209.670 s -> 204.115 s; 5.555 s saved (2.65% less request time; 1.027x speedup).
+   Transformer (profiled): 109.343 s -> 109.371 s; effectively unchanged.
+   Final 463-frame video SHA-256 is identical: 02f51bf5194b0337282c6e556f344b223aff79bac19b435d806bf72c9114ce19.
+   A 17-frame sample also produced an identical video and saved 6.694 s of full generation time.
+   Implemented as an opt-in guarded benchmark setting, REUSE_INITIAL_WAN_MODEL=1, in run_canonical.py; the source worker is unchanged. Validated for one request per worker instance at this fixed configuration. Consecutive requests and changed model/block-swap settings still need validation before production use.
+   Results: /home/raqeeb/code/infinite-talk-optimizations/script2video_direct/runs/with_face_fp8_stages_detail_frames49_sage22_reuse_wan/timings.json
+
+5. TeaCache on the four-step sampler with FP8, SageAttention 2.2, 49-frame windows, and Wan reuse
+   Threshold 0.26; start_step=1; end_step=2. Skips step index 2 at most once per window and runs the final denoising step.
+   Main 463-frame run: 12 transformer passes skipped across 12 windows; full generation 176.309 s.
+   Versus the original Q8 GGUF baseline: 267.065 s -> 176.309 s; 90.756 s saved (34.0% less request time; 1.515x speedup). This is the cumulative result of steps 1-5, not TeaCache's isolated gain.
+   Matched s01 sample isolated TeaCache gain: 124.117 s -> 108.814 s; 15.303 s saved (12.3% less request time; 1.141x speedup).
+   Main final-video similarity to original Q8 GGUF: 24.683472 dB PSNR; 0.924783 SSIM. TeaCache changes the video; inspect mouth motion alongside pixel metrics.
+   Benchmark setting: TEACACHE_THRESHOLD=0.26 TEACACHE_END_STEP=2 in run_canonical.py; the source worker is unchanged.
+   Results: /home/raqeeb/code/infinite-talk-optimizations/script2video_direct/runs/with_face_fp8_frames49_sage22_reuse_wan_tea260_end2/timings.json
+   Video: /home/raqeeb/code/infinite-talk-optimizations/script2video_direct/runs/with_face_fp8_frames49_sage22_reuse_wan_tea260_end2/final.mp4
+
+6. Cache identical padded VAE conditioning encodes within the request
+   Each 49-frame window can present the same padded conditioning tensor. Encode it once, reuse its latent only after exact tensor equality, and preserve the VAE cache reset on each hit.
+   Main 463-frame run: 11 cache hits and 1 full padded encode; the 12 shorter motion encodes still run. Full generation 176.309 s -> 158.016 s. This saves 18.293 s (10.4% less request time; 1.116x speedup) on top of steps 1-5.
+   Four validation samples (main, s01, s03, s06) produced final videos with SHA-256 hashes identical to their corresponding step-5 videos. PSNR versus step 5 is infinite and SSIM is 1.0; quality versus the original Q8 baseline is unchanged from step 5.
+   Benchmark setting: VAE_OPT_MODE=cache_identical_encode in run_canonical.py; the source worker is unchanged. The cache retains one padded input and latent in GPU memory; production integration remains to be done.
+   Results: /home/raqeeb/code/infinite-talk-optimizations/script2video_direct/comparisons/vae_cache/results.json
+   Video comparison: /home/raqeeb/code/infinite-talk-optimizations/script2video_direct/comparisons/vae_cache/main_baseline_current_cached.mp4
+
+Combined steps 1-3 versus original Q8 GGUF baseline: 179.246 s -> 108.637 s transformer time; 1.650x speedup and 39.4% less transformer time.
+Combined steps 1-3 full generation (unprofiled): 267.065 s -> 207.994 s; 59.071 s saved (22.1% less request time; 1.284x speedup).
+With step 4 enabled, the matched profiled optimized run took 204.115 s instead of 209.670 s. Do not directly compare this profiled measurement with the unprofiled 267.065 s Q8 baseline.
+Combined steps 1-6 full generation on the main sample (transformer-profiled runs): 267.065 s -> 158.016 s; 109.049 s saved (40.8% less request time; 1.690x speedup).
+All timing comparisons are single runs. PSNR and SSIM measure similarity to the specified reference video, not absolute visual quality.

@@ -1,0 +1,13 @@
+--- a/envs/env_1_main_5090_uv.sh
++++ b/envs/env_1_main_5090_uv.sh
+@@ -43,7 +43,9 @@
+     ${UVPIP} decord==0.6.0 --no-deps
+     ${UVPIP} loguru==0.7.3 --no-deps
+     ${UVPIP} librosa==0.11.0 --no-deps
+-    ${UVPIP} sageattention==1.0.6 --no-deps
++    # Build against this environment's PyTorch/CUDA stack, as in the benchmark.
++    # SageAttention 2.2 requires CUDA >= 12.8 on Blackwell.
++    ${UVPIP} sageattention==2.2.0 --no-build-isolation --no-deps
+     ${UVPIP} rembg[gpu]==2.0.65 --no-deps
+     ${UVPIP} optimum_quanto==0.2.7 --no-deps
+     ${UVPIP} pymatting==1.1.14 --no-deps
